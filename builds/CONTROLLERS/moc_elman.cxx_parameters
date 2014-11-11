@@ -1,0 +1,16 @@
+-I/usr/include/opencv
+-I/usr/include
+-I/usr/include/qt4
+-I/usr/include/qt4/QtOpenGL
+-I/usr/include/qt4/QtGui
+-I/usr/include/qt4/QtXml
+-I/usr/include/qt4/QtCore
+-D_GRAPHICS_
+-DQT_NO_DEBUG
+-DQT_OPENGL_LIB
+-DQT_GUI_LIB
+-DQT_XML_LIB
+-DQT_CORE_LIB
+-o
+/home/oal/Documents/Neural_Genetic_8/builds/CONTROLLERS/moc_elman.cxx
+/home/oal/Documents/Neural_Genetic_8/CONTROLLERS/elman.h

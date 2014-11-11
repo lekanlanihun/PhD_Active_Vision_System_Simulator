@@ -1,0 +1,16 @@
+GA parameters:
+--------------
+
+Num. total groups                   = 100
+Num. chromosome truncated           = 10
+Num. elite                          = 3
+Prob. of mutation                   = 0.05
+Prob. of recombination              = 0.5
+
+
+
+-----------------------------------------------
+-	e n d   o f   p a r a m e t e r s         -
+-----------------------------------------------
+
+This is just a check at the end = 999
