@@ -15,6 +15,7 @@ Artificial_Eye::Artificial_Eye(int BigRect, int SmallRect){
 
     //cout << "constructing eye" << endl;
     int num;
+   // peri_rows=4; peri_cols=59;
     hist_lbp_code.assign(59,0);
  hog_hist.assign(9,0);
 //Peripheral_Features_Descriptor.assign(9,0);
@@ -25,26 +26,26 @@ Artificial_Eye::Artificial_Eye(int BigRect, int SmallRect){
 
   bigRect =BigRect;
   smallRect =SmallRect;
-  image_path=new string[25];
+  image_path=new string[5];
 
   //vect_peripheral=new double[59];
-  Vect_Mat_peripheral=new double*[4];
-  for(int i=0;i<4;i++){
-      Vect_Mat_peripheral[i]=new double[59];
+  Vect_Mat_peripheral=new double*[peri_rows];
+  for(int i=0;i<peri_rows;i++){
+      Vect_Mat_peripheral[i]=new double[peri_cols];
   }
 
-  av=new double *[5];
-  for(int i=0;i<5;i++){
-    av[i]=new double[5];
+  av=new double *[smallRect];
+  for(int i=0;i<smallRect;i++){
+    av[i]=new double[smallRect];
   }
 
-  Vect_Mat_fovea=new double*[5];
-  for(int i=0;i<5;i++){
-    Vect_Mat_fovea[i]=new double [5];
+  Vect_Mat_fovea=new double*[smallRect];
+  for(int i=0;i<smallRect;i++){
+    Vect_Mat_fovea[i]=new double [smallRect];
   }
-segmented_peripheral=new int *[50];
-for(int i=0;i<50;i++){
-    segmented_peripheral[i]=new int[50];
+segmented_peripheral=new int *[bigRect];
+for(int i=0;i<bigRect;i++){
+    segmented_peripheral[i]=new int[bigRect];
 }
 
 
@@ -67,13 +68,13 @@ void Artificial_Eye::load_image(int evaluation ) {
   //GaussianBlur(image, image, Size(3, 3), 0, 0, BORDER_DEFAULT);
   //Covert the imgae into gray_scale (gray_image)
   cvtColor(image, gray_image, CV_BGR2GRAY);
-  //Segmentation_Method();
+  Segmentation_Method();
 
   //Add white borders to image
- copyMakeBorder(gray_image,image, bigRect, bigRect, bigRect, bigRect, BORDER_REPLICATE);
+ //copyMakeBorder(gray_image,image, bigRect, bigRect, bigRect, bigRect, BORDER_REPLICATE);
 
   //Copy image to gray_image
-  image.copyTo(gray_image);
+  //image.copyTo(gray_image);
 
 //cout<<"get to load image 2"<<endl;
 
@@ -89,7 +90,7 @@ void Artificial_Eye::set_images_path( void ){
     image_path[3]="/home/oal/Active_Vision_Letters/inputImage4o25x69-100.bmp";
     image_path[4]="/home/oal/Active_Vision_Letters/inputImage5j51x39-100.bmp";*/
 
- image_path[0]= "/home/oal/Active_Vision_Letters/inputImage1l37x63-120.bmp";
+ /*image_path[0]= "/home/oal/Active_Vision_Letters/inputImage1l37x63-120.bmp";
   image_path[1]="/home/oal/Active_Vision_Letters/resized100_inputImage2_120.bmp";
   image_path[2]="/home/oal/Active_Vision_Letters/resized100_inputImage3_120.bmp";
   image_path[3]="/home/oal/Active_Vision_Letters/resized100_inputImage4_120.bmp";
@@ -113,15 +114,15 @@ void Artificial_Eye::set_images_path( void ){
   image_path[21]="/home/oal/Active_Vision_Letters/resized100_inputImage2_80.bmp";
   image_path[22]="/home/oal/Active_Vision_Letters/resized100_inputImage3_80.bmp";
   image_path[23]="/home/oal/Active_Vision_Letters/resized100_inputImage4_80.bmp";
-  image_path[24]="/home/oal/Active_Vision_Letters/resized100_inputImage5_80.bmp";
+  image_path[24]="/home/oal/Active_Vision_Letters/resized100_inputImage5_80.bmp";*/
 
 
-    /* image_path[0]="/home/oal/icub_imges/frame000.ppm";
+      image_path[0]="/home/oal/icub_imges/frame000.ppm";
       image_path[1]="/home/oal/icub_imges/frame004.ppm";
       image_path[2]="/home/oal/icub_imges/frame016.ppm";
       image_path[3]="/home/oal/icub_imges/frame021.ppm";
-      image_path[4]="/home/oal/icub_imges/frame005.ppm";*/
-    //cout<<"get to set_images_path 2"<<endl;
+      image_path[4]="/home/oal/icub_imges/frame005.ppm";
+   // cout<<"get to set_images_path 2"<<endl;
 }
 
 /* -------------------------------------------------------------------- */
@@ -160,10 +161,10 @@ double ** Artificial_Eye::Get_Fovea() {
   //Init_Histogram_Oriented_Gradient();
   uniform_lbp_histogram();
    //cout<<"get to eye Get Periphreal 2"<<endl;
-   for (int i = 0; i < 4; i++) {
+   for (int i = 0; i <peri_rows; i++) {
        // cout<<"get to eye Get Periphreal 1b"<<endl;
-       for (int j = 0; j <hist_lbp_code.size(); j++) {
-          // Vect_Mat_peripheral[i][j]=1-Vect_Mat_peripheral[i][j];
+       for (int j = 0; j <peri_cols; j++) {
+           Vect_Mat_peripheral[i][j]=1-Vect_Mat_peripheral[i][j];
          //cout << "vect_peripheral["<<i<<"]["<<j<<"]=" << " " << Vect_Mat_peripheral[i][j] << endl;
        }
         //cout<<"get to eye Get Periphreal 1d"<<endl;
@@ -308,9 +309,9 @@ void Artificial_Eye::Set_Eye_Movement(vector <double> &output) {
   current_x_position += (int)(rint( (output[0]*24.0) -12.0) );
   current_y_position += (int)(rint( (output[1]*24.0) -12.0) );
 
- if( current_x_position > gray_image.cols-bigRect ) current_x_position = gray_image.cols-50;
+ if( current_x_position > gray_image.cols-bigRect ) current_x_position = gray_image.cols-bigRect;
   else if( current_x_position < 0 ) current_x_position = 0;
-  if( current_y_position > gray_image.rows - bigRect ) current_y_position = gray_image.rows-50;
+  if( current_y_position > gray_image.rows - bigRect ) current_y_position = gray_image.rows-bigRect;
   else if( current_y_position < 0 ) current_y_position = 0;
 
   /*if( current_x_position > gray_image.cols) current_x_position = gray_image.cols;
@@ -324,26 +325,26 @@ void Artificial_Eye::Set_Eye_Movement(vector <double> &output) {
 
 
 void Artificial_Eye::view_eye_movement(){
-    rectangle(image,cvPoint(rectPosition.x,rectPosition.y), cvPoint(rectPosition.x + bigRect, rectPosition.y + bigRect), Scalar(0, 0, 255), 1, 8);
+    rectangle(gray_image,cvPoint(rectPosition.x,rectPosition.y), cvPoint(rectPosition.x + bigRect, rectPosition.y + bigRect), Scalar(0, 0, 255), 1, 8);
     // rectangle(detected_edges,cvPoint(rectPosition.x,rectPosition.y),cvPoint(rectPosition.x + bigRect, rectPosition.y + bigRect), Scalar(0, 0, 255), 1, 8);
     //rectangle(image, cvPoint(rectPosition.x + (bigRect / 2) - 2, rectPosition.y + (bigRect / 2) - 2), cvPoint(rectPosition.x + (bigRect / 2) + 2 , rectPosition.y + (bigRect / 2) + 2), Scalar(0, 255, 0), 1, 8);
-   imshow("Eye Movement Simulation",image);
+   imshow("Eye Movement Simulation",gray_image);
     //imshow("Eye Movement Simulation",detected_edges);
 
 }
     
 void Artificial_Eye::Init_Eye_Position( ){
- //cout<<"get to Init eye position"<<endl;
+// cout<<"get to Init eye position"<<endl;
  // current_x_position = gray_image.cols/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
  //current_y_position = gray_image.rows/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
-  current_x_position = gray_image.cols/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
-  current_y_position = gray_image.rows/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
+  //current_x_position = gray_image.cols/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
+  //current_y_position = gray_image.rows/2 - 25 + (int)((gsl_rng_uniform_int(GSL_randon_generator::r_rand, 33)) - 16);
     //int x_random=(int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) * x_coordinates_rand_offsets_range) + x_coordinates_rand_offsets_lower_bound );
    // int y_random=(int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) * y_coordinates_rand_offsets_range) + y_coordinates_rand_offsets_lower_bound );
     //cout<<"x_random="<<" "<<x_random<<"y_random="<<" "<<y_random<<endl;
 
-  //current_x_position = ((gray_image.cols/2)-5) + (int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) * x_coordinates_rand_offsets_range) + x_coordinates_rand_offsets_lower_bound );
-  //current_y_position = ((gray_image.rows/2)-5) + (int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) *y_coordinates_rand_offsets_range) + x_coordinates_rand_offsets_lower_bound);
+  current_x_position = ((gray_image.cols/2)-5) + (int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) * x_coordinates_rand_offsets_range) + x_coordinates_rand_offsets_lower_bound );
+  current_y_position = ((gray_image.rows/2)-5) + (int)((gsl_rng_uniform_pos( GSL_randon_generator::r_rand ) *y_coordinates_rand_offsets_range) + x_coordinates_rand_offsets_lower_bound);
     //current_x_position = 132;
      //current_y_position =100 ;
   rectPosition.x=  current_x_position;
@@ -372,7 +373,7 @@ void Artificial_Eye::Set_Eye_Position(int x,int y) {
 
 
 void Artificial_Eye::uniform_Lbp(){
-
+//cout<<"uniform_Lbp_1"<<endl;
                const char lookup[256] = {
                0, 1, 2, 3, 4, 58, 5, 6, 7, 58, 58, 58, 8, 58, 9, 10,
                11, 58, 58, 58, 58, 58, 58, 58, 12, 58, 58, 58, 13, 58, 14, 15,
@@ -424,20 +425,22 @@ void Artificial_Eye::uniform_Lbp(){
 
                }
 
-               off_grid_cell_x += 25;
+               off_grid_cell_x += (int)bigRect/2;
                counter++;
                if (off_grid_cell_x >= PeripheralArea.rows - 2) {
                    off_grid_cell_x = 0;
-                   off_grid_cell_y += 25;
+                   off_grid_cell_y += (int)bigRect/2;
                }
            } while (off_grid_cell_y < PeripheralArea.cols - 1);
+//cout<<"uniform_Lbp_2"<<endl;
+
 
 }
 
 
 
 void Artificial_Eye::uniform_lbp_histogram(){
-      //cout<<"get to eye lbp_histogram 1"<<endl;
+    //  cout<<"get to eye lbp_histogram 1"<<endl;
     uniform_Lbp();
        //cout<<"get to eye lbp_histogram 2"<<endl;
 
@@ -608,28 +611,28 @@ void  Artificial_Eye::Histogram_Oriented_Gradient(){
 
 
 Artificial_Eye::~Artificial_Eye() {
-  // cout << "Deallocating artifical eye";
+   cout << "Deallocating artifical eye"<<endl;
     delete[] image_path;
 
-    for(int i=0;i<5;i++){
+    for(int i=0;i<smallRect;i++){
         delete [] Vect_Mat_fovea [i];
     }
     delete [] Vect_Mat_fovea;
 
-  for(int i=0;i<5;i++){
+  for(int i=0;i<smallRect;i++){
        delete [] av[i];
     }
     delete [] av;
 
-    for(int i=0;i<4;i++){
+    for(int i=0;i<peri_rows;i++){
         delete []Vect_Mat_peripheral[i];
     }
     delete[] Vect_Mat_peripheral;
 
-    for(int i=0;i<50;i++){
+    for(int i=0;i<bigRect;i++){
         delete []segmented_peripheral[i];
     }
     delete[] segmented_peripheral;
-    //`cout << "Deallocated artifical eye";
+   // `cout<<"Deallocated artifical eye"<<endl;
 }
 
