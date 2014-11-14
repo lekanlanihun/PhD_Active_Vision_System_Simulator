@@ -38,6 +38,7 @@ using namespace std;
 class Artificial_Eye {
  public:
   Artificial_Eye ( int, int );
+ int bigRect, smallRect;
   //Artificial_Eye(const Artificial_Eye& orig);
 void Init_Histogram_Oriented_Gradient(void);
   void load_image(int);
@@ -68,7 +69,9 @@ vector<double>hog_hist;
   virtual ~Artificial_Eye();
   
  private:
- int bigRect, smallRect;
+
+ int  peri_rows=4, peri_cols=59; 
+//int static fovea_rows, fovea_cols;
      Mat detected_edges;
   Mat image;
   Mat gray_image;
