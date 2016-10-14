@@ -1,0 +1,7 @@
+ICUB IMAGES 175 EVALUATION DATASETS (SCALES AND ROTATION)
+Scaled in the range: [+45%,-45%]
+i.e at 15% interval to the intermediate image(original image size/scale: original left as it was): all making 6 scales for each of the five images (total 35 scales inluding the original simage sizes)
+Rotated in the range: [+9,-9] degrees to the intermediate orientation (i.e riginal image which is at 0 degree orientation)
+i.e at interval 3  degree interval for each of the 35 scaled images (original 5 image sizes also rotated with +3 degree to the initial oriention of zero) i.e five orientation
+ 
+This gives a total of: 35 X 5 : 175 images
